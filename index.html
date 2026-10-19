@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="en" class="dark scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NexaAI - Next-Gen AI Automation Platform</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            purple: '#8b5cf6',
+                            teal: '#14b8a6',
+                            dark: '#090d16',
+                            card: '#111827',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #080c14;
+            color: #f3f4f6;
+        }
+
+        /* Glassmorphism Styles */
+        .glass-panel {
+            background: rgba(17, 24, 39, 0.65);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        
+        .glass-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            transition: all 0.3s ease;
+        }
+        
+        .glass-card:hover {
+            border-color: rgba(139, 92, 246, 0.4);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px -10px rgba(139, 92, 246, 0.2);
+        }
+
+        /* Gradient Glows */
+        .glow-purple {
+            box-shadow: 0 0 50px -10px rgba(139, 92, 246, 0.3);
+        }
+        
+        .glow-teal {
+            box-shadow: 0 0 50px -10px rgba(20, 184, 166, 0.3);
+        }
+
+        /* Gradient Text */
+        .gradient-text {
+            background: linear-gradient(135deg, #a78bfa 0%, #38bdf8 50%, #2dd4bf 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #080c14;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1f2937;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #374151;
+        }
+    </style>
+</head>
+<body class="bg-[#080c14] text-gray-100 antialiased selection:bg-purple-500 selection:text-white">
+
+    <!-- Toast Notification System -->
+    <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-3 pointer-events-none"></div>
+
+    <!-- Navigation Header -->
+    <header class="fixed top-0 left-0 w-full z-40 glass-panel border-b border-gray-800/50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            <!-- Logo -->
+            <a href="#" class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-purple-600 to-teal-400 flex items-center justify-center shadow-lg shadow-purple-500/30">
+                    <i class="fa-solid font-bold text-white text-xl">N</i>
+                </div>
+                <span class="text-2xl font-extrabold tracking-tight text-white">Nexa<span class="text-purple-400">AI</span></span>
+            </a>
+
+            <!-- Desktop Nav Links -->
+            <nav class="hidden md:flex items-center gap-8 text-sm font-medium text-gray-300">
+                <a href="#features" class="hover:text-purple-400 transition-colors">Features</a>
+                <a href="#demo" class="hover:text-purple-400 transition-colors">Live Simulation</a>
+                <a href="#calculator" class="hover:text-purple-400 transition-colors">ROI Calculator</a>
+                <a href="#pricing" class="hover:text-purple-400 transition-colors">Pricing</a>
+                <a href="#testimonials" class="hover:text-purple-400 transition-colors">Reviews</a>
+            </nav>
+
+            <!-- Actions -->
+            <div class="hidden md:flex items-center gap-4">
+                <button onclick="openCheckout('Free Trial')" class="text-sm font-semibold text-gray-300 hover:text-white px-4 py-2 transition-colors">Log In</button>
+                <a href="#pricing" class="relative inline-flex items-center justify-center p-0.5 overflow-hidden text-sm font-semibold rounded-xl group bg-gradient-to-br from-purple-600 to-teal-400 group-hover:from-purple-600 group-hover:to-teal-400 hover:text-white text-white focus:ring-4 focus:outline-none focus:ring-purple-800">
+                    <span class="relative px-5 py-2.5 transition-all ease-in duration-75 bg-gray-900 rounded-[10px] group-hover:bg-opacity-0">
+                        Get Started Free
+                    </span>
+                </a>
+            </div>
+
+            <!-- Mobile Menu Button -->
+            <button id="mobile-menu-btn" class="md:hidden text-gray-300 hover:text-white text-2xl p-2 focus:outline-none" aria-label="Toggle Menu">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Mobile Drawer Overlay -->
+    <div id="drawer-overlay" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-40 hidden opacity-0 transition-opacity duration-300"></div>
+
+    <!-- Mobile Navigation Drawer -->
+    <div id="mobile-drawer" class="fixed top-0 right-0 h-full w-4/5 max-w-sm glass-panel z-50 transform translate-x-full transition-transform duration-300 p-6 flex flex-col justify-between">
+        <div>
+            <div class="flex items-center justify-between border-b border-gray-800 pb-4 mb-6">
+                <div class="flex items-center gap-2">
+                    <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-purple-600 to-teal-400 flex items-center justify-center font-bold text-white">N</div>
+                    <span class="text-xl font-bold text-white">Nexa<span class="text-purple-400">AI</span></span>
+                </div>
+                <button id="close-drawer-btn" class="text-gray-400 hover:text-white text-xl p-2" aria-label="Close Menu">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <nav class="flex flex-col gap-4 text-lg font-medium text-gray-300">
+                <a href="#features" class="drawer-link py-2 border-b border-gray-800/50 hover:text-purple-400">Features</a>
+                <a href="#demo" class="drawer-link py-2 border-b border-gray-800/50 hover:text-purple-400">Live Simulation</a>
+                <a href="#calculator" class="drawer-link py-2 border-b border-gray-800/50 hover:text-purple-400">ROI Calculator</a>
+                <a href="#pricing" class="drawer-link py-2 border-b border-gray-800/50 hover:text-purple-400">Pricing</a>
+                <a href="#testimonials" class="drawer-link py-2 border-b border-gray-800/50 hover:text-purple-400">Reviews</a>
+            </nav>
+        </div>
+
+        <div class="flex flex-col gap-3 pt-6 border-t border-gray-800">
+            <button onclick="openCheckout('Free Trial')" class="w-full py-3 bg-gray-800 hover:bg-gray-700 rounded-xl font-semibold text-white">Log In</button>
+            <a href="#pricing" onclick="closeDrawer()" class="w-full text-center py-3 bg-gradient-to-r from-purple-600 to-teal-500 rounded-xl font-semibold text-white shadow-lg shadow-purple-500/20">Get Started Free</a>
+        </div>
+    </div>
+
+    <!-- Hero Section -->
+    <section class="relative pt-36 pb-20 md:pt-48 md:pb-32 overflow-hidden">
+        <!-- Background Ambient Glows -->
+        <div class="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-purple-600/20 rounded-full blur-[140px] pointer-events-none"></div>
+        <div class="absolute top-1/3 right-10 w-[300px] h-[300px] bg-teal-500/15 rounded-full blur-[120px] pointer-events-none"></div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
+            <!-- Badge -->
+            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-card border border-purple-500/30 text-purple-300 text-xs sm:text-sm font-medium mb-8 animate-pulse">
+                <span class="w-2 h-2 rounded-full bg-teal-400"></span>
+                <span>NexaAI v3.0 Powered Autonomous Workflows</span>
+                <i class="fa-solid fa-arrow-right text-xs ml-1"></i>
+            </div>
+
+            <!-- Main Heading -->
+            <h1 class="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight leading-tight max-w-5xl mx-auto">
+                Automate Complex Operations with <span class="gradient-text">Next-Gen AI Agents</span>
+            </h1>
+
+            <!-- Subtitle -->
+            <p class="mt-6 text-lg sm:text-xl text-gray-400 max-w-3xl mx-auto font-normal">
+                Deploy intelligent autonomous AI workflows that analyze data, orchestrate software tools, and scale your business operations 10x faster without writing code.
+            </p>
+
+            <!-- Hero CTAs -->
+            <div class="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
+                <a href="#pricing" class="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-purple-600 via-indigo-600 to-teal-500 hover:opacity-95 text-white font-semibold rounded-2xl shadow-lg shadow-purple-500/25 transition-all transform hover:-translate-y-0.5 flex items-center justify-center gap-2">
+                    <span>Start 14-Day Free Trial</span>
+                    <i class="fa-solid fa-bolt text-teal-300"></i>
+                </a>
+                <a href="#demo" class="w-full sm:w-auto px-8 py-4 glass-card hover:bg-white/10 text-white font-semibold rounded-2xl transition-all border border-gray-700 flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-play text-xs text-purple-400"></i>
+                    <span>Watch Interactive Demo</span>
+                </a>
+            </div>
+
+            <!-- Social Proof Bar -->
+            <div class="mt-16 pt-8 border-t border-gray-800/60 max-w-4xl mx-auto">
+                <p class="text-xs uppercase tracking-widest text-gray-500 font-semibold mb-6">Trusted by 10,000+ teams at high-growth companies</p>
+                <div class="flex flex-wrap items-center justify-center gap-8 md:gap-14 opacity-60 grayscale hover:grayscale-0 transition-all">
+                    <span class="text-lg font-bold tracking-wider text-gray-300"><i class="fa-brands fa-google mr-2"></i>Google</span>
+                    <span class="text-lg font-bold tracking-wider text-gray-300"><i class="fa-brands fa-aws mr-2"></i>AWS</span>
+                    <span class="text-lg font-bold tracking-wider text-gray-300"><i class="fa-brands fa-spotify mr-2"></i>Spotify</span>
+                    <span class="text-lg font-bold tracking-wider text-gray-300"><i class="fa-brands fa-shopify mr-2"></i>Shopify</span>
+                    <span class="text-lg font-bold tracking-wider text-gray-300"><i class="fa-brands fa-slack mr-2"></i>Slack</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Key Features Section -->
+    <section id="features" class="py-20 relative">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-3xl mx-auto mb-16">
+                <h2 class="text-xs uppercase tracking-widest text-teal-400 font-semibold mb-3">Enterprise Power</h2>
+                <p class="text-3xl sm:text-5xl font-extrabold text-white tracking-tight">Everything you need to automate work</p>
+                <p class="mt-4 text-gray-400 text-lg">Engineered for teams that demand enterprise speed, reliability, and precision.</p>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-8">
+                <!-- Feature 1 -->
+                <div class="glass-card p-8 rounded-3xl relative overflow-hidden group">
+                    <div class="w-14 h-14 rounded-2xl bg-purple-600/20 text-purple-400 flex items-center justify-center text-2xl mb-6 group-hover:scale-110 transition-transform">
+                        <i class="fa-solid fa-diagram-project"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-3">Autonomous Agents</h3>
+                    <p class="text-gray-400 leading-relaxed text-sm">
+                        Create multi-step agentic workflows that learn, adapt, and make logical choices across complex software environments.
+                    </p>
+                    <div class="mt-6 pt-4 border-t border-gray-800/80 flex items-center text-purple-400 text-sm font-semibold">
+                        <span>Learn more</span>
+                        <i class="fa-solid fa-chevron-right text-xs ml-2 group-hover:translate-x-1 transition-transform"></i>
+                    </div>
+                </div>
+
+                <!-- Feature 2 -->
+                <div class="glass-card p-8 rounded-3xl relative overflow-hidden group">
+                    <div class="w-14 h-14 rounded-2xl bg-teal-500/20 text-teal-400 flex items-center justify-center text-2xl mb-6 group-hover:scale-110 transition-transform">
+                        <i class="fa-solid fa-plug-zapper"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-3">500+ App Integrations</h3>
+                    <p class="text-gray-400 leading-relaxed text-sm">
+                        Seamlessly connect with Slack, Salesforce, Notion, GitHub, Google Workspace, and custom APIs out of the box.
+                    </p>
+                    <div class="mt-6 pt-4 border-t border-gray-800/80 flex items-center text-teal-400 text-sm font-semibold">
+                        <span>View integrations</span>
+                        <i class="fa-solid fa-chevron-right text-xs ml-2 group-hover:translate-x-1 transition-transform"></i>
+                    </div>
+                </div>
+
+                <!-- Feature 3 -->
+                <div class="glass-card p-8 rounded-3xl relative overflow-hidden group">
+                    <div class="w-14 h-14 rounded-2xl bg-indigo-500/20 text-indigo-400 flex items-center justify-center text-2xl mb-6 group-hover:scale-110 transition-transform">
+                        <i class="fa-solid fa-shield-halved"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-3">SOC-2 Type II Security</h3>
+                    <p class="text-gray-400 leading-relaxed text-sm">
+                        Bank-grade end-to-end data encryption, custom role permissions, audit trails, and self-hosted privacy compliance.
+                    </p>
+                    <div class="mt-6 pt-4 border-t border-gray-800/80 flex items-center text-indigo-400 text-sm font-semibold">
+                        <span>Security whitepaper</span>
+                        <i class="fa-solid fa-chevron-right text-xs ml-2 group-hover:translate-x-1 transition-transform"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Live Interactive Prompt Simulation Demo -->
+    <section id="demo" class="py-20 relative bg-gray-900/40 border-y border-gray-800/50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-3xl mx-auto mb-12">
+                <h2 class="text-xs uppercase tracking-widest text-purple-400 font-semibold mb-3">Interactive Playground</h2>
+                <p class="text-3xl sm:text-4xl font-extrabold text-white">Experience NexaAI in Action</p>
+                <p class="mt-3 text-gray-400">Select a prompt template or run a simulated real-time autonomous execution stream.</p>
+            </div>
+
+            <!-- Terminal Mockup Container -->
+            <div class="max-w-4xl mx-auto glass-panel rounded-3xl shadow-2xl overflow-hidden border border-purple-500/20">
+                <!-- Terminal Header -->
+                <div class="bg-gray-950 px-6 py-4 flex items-center justify-between border-b border-gray-800">
+                    <div class="flex items-center gap-2">
+                        <div class="w-3 h-3 rounded-full bg-red-500/80"></div>
+                        <div class="w-3 h-3 rounded-full bg-yellow-500/80"></div>
+                        <div class="w-3 h-3 rounded-full bg-green-500/80"></div>
+                        <span class="ml-4 text-xs font-mono text-gray-400 flex items-center gap-2">
+                            <i class="fa-solid fa-terminal text-purple-400"></i> nexa-agent-v3.0.sh
+                        </span>
+                    </div>
+                    <span class="text-xs px-2.5 py-1 rounded bg-teal-500/10 text-teal-400 font-mono flex items-center gap-1.5">
+                        <span class="w-2 h-2 rounded-full bg-teal-400 animate-ping"></span> Live Engine
+                    </span>
+                </div>
+
+                <!-- Simulation Content Area -->
+                <div class="p-6 md:p-8 bg-gray-950/90 font-mono text-sm min-h-[380px] flex flex-col justify-between">
+                    <!-- Preset Selector Buttons -->
+                    <div class="mb-6">
+                        <label class="block text-xs uppercase text-gray-500 mb-2 font-sans font-semibold">Choose Workflow Scenario:</label>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                            <button onclick="setPrompt('lead')" class="prompt-btn active text-left p-3 rounded-xl border border-purple-500/50 bg-purple-500/10 text-purple-300 hover:border-purple-400 transition-all">
+                                <i class="fa-solid fa-filter mr-2"></i>Lead Enrichment
+                            </button>
+                            <button onclick="setPrompt('support')" class="prompt-btn text-left p-3 rounded-xl border border-gray-800 bg-gray-900 text-gray-400 hover:border-gray-700 transition-all">
+                                <i class="fa-solid fa-headset mr-2"></i>Support Triage
+                            </button>
+                            <button onclick="setPrompt('report')" class="prompt-btn text-left p-3 rounded-xl border border-gray-800 bg-gray-900 text-gray-400 hover:border-gray-700 transition-all">
+                                <i class="fa-solid fa-chart-pie mr-2"></i>Weekly Revenue Report
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Streaming Output Window -->
+                    <div id="demo-output-box" class="p-4 rounded-2xl bg-gray-900 border border-gray-800/80 text-gray-300 font-mono text-xs sm:text-sm min-h-[160px] overflow-y-auto space-y-2">
+                        <p class="text-gray-500">// Select a prompt above and click "Run Agent Flow" to start...</p>
+                    </div>
+
+                    <!-- Control Action -->
+                    <div class="mt-6 flex items-center gap-4">
+                        <button id="run-demo-btn" onclick="startDemoStream()" class="px-6 py-3 bg-gradient-to-r from-purple-600 to-teal-500 hover:opacity-90 text-white font-sans font-semibold rounded-xl shadow-lg transition-all flex items-center gap-2">
+                            <i class="fa-solid fa-play"></i>
+                            <span>Run Agent Flow</span>
+                        </button>
+                        <button onclick="clearDemoStream()" class="px-4 py-3 bg-gray-800 hover:bg-gray-700 text-gray-300 font-sans font-medium rounded-xl transition-all">
+                            Clear Console
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ROI & Savings Calculator Section -->
+    <section id="calculator" class="py-20 relative">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="max-w-4xl mx-auto glass-panel p-8 sm:p-12 rounded-3xl border border-gray-800 relative overflow-hidden">
+                <div class="absolute -right-20 -bottom-20 w-80 h-80 bg-teal-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+                <div class="text-center mb-10">
+                    <h2 class="text-xs uppercase tracking-widest text-teal-400 font-semibold mb-2">Cost & Time Efficiency</h2>
+                    <h3 class="text-3xl font-extrabold text-white">Interactive ROI Calculator</h3>
+                    <p class="text-gray-400 mt-2">Estimate how much time and money NexaAI saves your organization monthly.</p>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-10 items-center">
+                    <!-- Sliders Side -->
+                    <div class="space-y-6">
+                        <div>
+                            <div class="flex justify-between items-center mb-2">
+                                <label class="text-sm font-semibold text-gray-300">Team Size (Engineers/Ops)</label>
+                                <span id="team-size-val" class="text-lg font-bold text-purple-400">10 Members</span>
+                            </div>
+                            <input type="range" id="team-size-range" min="1" max="100" value="10" class="w-full h-2 bg-gray-800 rounded-lg appearance-none cursor-pointer accent-purple-500" oninput="calculateROI()">
+                        </div>
+
+                        <div>
+                            <div class="flex justify-between items-center mb-2">
+                                <label class="text-sm font-semibold text-gray-300">Avg Hourly Rate</label>
+                                <span id="hourly-rate-val" class="text-lg font-bold text-purple-400">$45 / hr</span>
+                            </div>
+                            <input type="range" id="hourly-rate-range" min="15" max="150" value="45" step="5" class="w-full h-2 bg-gray-800 rounded-lg appearance-none cursor-pointer accent-teal-400" oninput="calculateROI()">
+                        </div>
+
+                        <div>
+                            <div class="flex justify-between items-center mb-2">
+                                <label class="text-sm font-semibold text-gray-300">Manual Hours / Week / Person</label>
+                                <span id="manual-hours-val" class="text-lg font-bold text-purple-400">12 Hours</span>
+                            </div>
+                            <input type="range" id="manual-hours-range" min="2" max="30" value="12" class="w-full h-2 bg-gray-800 rounded-lg appearance-none cursor-pointer accent-purple-500" oninput="calculateROI()">
+                        </div>
+                    </div>
+
+                    <!-- Calculated Output Card -->
+                    <div class="p-6 rounded-2xl bg-gray-950/80 border border-gray-800 text-center space-y-6">
+                        <div>
+                            <span class="text-xs uppercase tracking-wider text-gray-400 font-semibold">Estimated Monthly Savings</span>
+                            <div id="usd-savings" class="text-4xl sm:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-teal-400 mt-1">
+                                $16,200
+                            </div>
+                            <div id="pkr-savings" class="text-sm font-medium text-teal-400/90 mt-1">
+                                approx.  PKR 4,503,600 / month
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4 pt-4 border-t border-gray-800">
+                            <div>
+                                <span class="text-xs text-gray-500 block">Hours Saved/Mo</span>
+                                <span id="hours-saved" class="text-xl font-bold text-white">360 hrs</span>
+                            </div>
+                            <div>
+                                <span class="text-xs text-gray-500 block">Efficiency Boost</span>
+                                <span class="text-xl font-bold text-purple-400">75%</span>
+                            </div>
+                        </div>
+
+                        <button onclick="openCheckout('ROI Plan Consultation')" class="w-full py-3 bg-gradient-to-r from-purple-600 to-teal-500 text-white rounded-xl font-semibold shadow-md hover:opacity-90 transition-all">
+                            Unlock These Savings Now
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing Section with Dynamic Switcher -->
+    <section id="pricing" class="py-20 relative">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-3xl mx-auto mb-12">
+                <h2 class="text-xs uppercase tracking-widest text-purple-400 font-semibold mb-3">Transparent Pricing</h2>
+                <p class="text-3xl sm:text-5xl font-extrabold text-white">Simple Plans for Every Team Scale</p>
+                
+                <!-- Monthly / Yearly Switcher -->
+                <div class="mt-8 inline-flex items-center gap-3 p-1.5 rounded-2xl glass-card border border-gray-800">
+                    <span id="label-monthly" class="text-sm font-semibold text-white px-3 py-1">Monthly</span>
+                    <button id="pricing-toggle" onclick="togglePricing()" class="w-14 h-8 bg-purple-600 rounded-full p-1 relative transition-colors focus:outline-none" aria-label="Toggle Billing Interval">
+                        <div id="toggle-dot" class="w-6 h-6 bg-white rounded-full transition-transform transform translate-x-0"></div>
+                    </button>
+                    <span id="label-yearly" class="text-sm font-semibold text-gray-400 px-3 py-1 flex items-center gap-1.5">
+                        Yearly <span class="text-[10px] bg-teal-500/20 text-teal-300 border border-teal-500/30 font-bold px-2 py-0.5 rounded-full">Save 20%</span>
+                    </span>
+                </div>
+            </div>
+
+            <!-- Pricing Cards Grid -->
+            <div class="grid md:grid-cols-3 gap-8 items-stretch">
+                <!-- Starter Plan -->
+                <div class="glass-card p-8 rounded-3xl flex flex-col justify-between border border-gray-800">
+                    <div>
+                        <h3 class="text-xl font-bold text-white">Starter</h3>
+                        <p class="text-gray-400 text-sm mt-1">Ideal for small startups & solo builders.</p>
+                        <div class="my-6">
+                            <span class="plan-price text-4xl font-extrabold text-white" data-monthly="$29" data-yearly="$23">$29</span>
+                            <span class="text-gray-400 text-sm">/ month</span>
+                        </div>
+                        <ul class="space-y-3 text-sm text-gray-300">
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-teal-400"></i> 5 Autonomous Agents</li>
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-teal-400"></i> Up to 10,000 tasks/mo</li>
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-teal-400"></i> Standard App Integrations</li>
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-teal-400"></i> Community Support</li>
+                        </ul>
+                    </div>
+                    <button onclick="openCheckout('Starter Plan')" class="mt-8 w-full py-3 bg-gray-800 hover:bg-gray-700 text-white rounded-xl font-semibold transition-all">Start Free Trial</button>
+                </div>
+
+                <!-- Pro Plan (Featured) -->
+                <div class="glass-card p-8 rounded-3xl flex flex-col justify-between border-2 border-purple-500 relative bg-purple-950/10 shadow-2xl shadow-purple-500/10">
+                    <div class="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-gradient-to-r from-purple-600 to-teal-400 text-white text-xs font-bold uppercase tracking-wider px-4 py-1 rounded-full shadow">
+                        Most Popular
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-bold text-white">Professional</h3>
+                        <p class="text-gray-400 text-sm mt-1">For growing teams automating high volume.</p>
+                        <div class="my-6">
+                            <span class="plan-price text-4xl font-extrabold text-white" data-monthly="$99" data-yearly="$79">$99</span>
+                            <span class="text-gray-400 text-sm">/ month</span>
+                        </div>
+                        <ul class="space-y-3 text-sm text-gray-300">
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-teal-400"></i> Unlimited AI Agents</li>
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-teal-400"></i> Up to 100,000 tasks/mo</li>
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-teal-400"></i> Advanced Custom Webhooks</li>
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-teal-400"></i> Priority SLA Support</li>
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-teal-400"></i> Dedicated Workflow Builder</li>
+                        </ul>
+                    </div>
+                    <button onclick="openCheckout('Pro Plan')" class="mt-8 w-full py-3 bg-gradient-to-r from-purple-600 to-teal-500 hover:opacity-90 text-white rounded-xl font-semibold shadow-lg shadow-purple-500/25 transition-all">Get Pro Tier</button>
+                </div>
+
+                <!-- Enterprise Plan -->
+                <div class="glass-card p-8 rounded-3xl flex flex-col justify-between border border-gray-800">
+                    <div>
+                        <h3 class="text-xl font-bold text-white">Enterprise</h3>
+                        <p class="text-gray-400 text-sm mt-1">Dedicated cloud & custom security control.</p>
+                        <div class="my-6">
+                            <span class="plan-price text-4xl font-extrabold text-white" data-monthly="$299" data-yearly="$239">$299</span>
+                            <span class="text-gray-400 text-sm">/ month</span>
+                        </div>
+                        <ul class="space-y-3 text-sm text-gray-300">
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-teal-400"></i> Everything in Pro</li>
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-teal-400"></i> Custom LLM Fine-Tuning</li>
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-teal-400"></i> On-Premise/VPC Deployment</li>
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-teal-400"></i> Dedicated Account Manager</li>
+                        </ul>
+                    </div>
+                    <button onclick="openCheckout('Enterprise Plan')" class="mt-8 w-full py-3 bg-gray-800 hover:bg-gray-700 text-white rounded-xl font-semibold transition-all">Contact Sales</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials / Social Proof -->
+    <section id="testimonials" class="py-20 relative bg-gray-900/30">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-2xl mx-auto mb-16">
+                <h2 class="text-xs uppercase tracking-widest text-teal-400 font-semibold mb-2">Success Stories</h2>
+                <h3 class="text-3xl font-extrabold text-white">Loved by Engineering & Ops Teams</h3>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="glass-card p-6 rounded-2xl flex flex-col justify-between">
+                    <p class="text-gray-300 text-sm italic leading-relaxed">
+                        "NexaAI automated 80% of our tier-1 customer support triage within 48 hours of setup. Our resolution times dropped instantly."
+                    </p>
+                    <div class="mt-6 flex items-center gap-3 pt-4 border-t border-gray-800">
+                        <div class="w-10 h-10 rounded-full bg-purple-500/20 text-purple-300 flex items-center justify-center font-bold">AK</div>
+                        <div>
+                            <div class="text-sm font-bold text-white">Alex Kramer</div>
+                            <div class="text-xs text-gray-500">VP of Ops at SaaSify</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="glass-card p-6 rounded-2xl flex flex-col justify-between">
+                    <p class="text-gray-300 text-sm italic leading-relaxed">
+                        "The agentic workflow capability is light years ahead. We replaced three disjointed automation tools with single NexaAI pipelines."
+                    </p>
+                    <div class="mt-6 flex items-center gap-3 pt-4 border-t border-gray-800">
+                        <div class="w-10 h-10 rounded-full bg-teal-500/20 text-teal-300 flex items-center justify-center font-bold">SL</div>
+                        <div>
+                            <div class="text-sm font-bold text-white">Sophia Lin</div>
+                            <div class="text-xs text-gray-500">Head of Data at FinPulse</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="glass-card p-6 rounded-2xl flex flex-col justify-between">
+                    <p class="text-gray-300 text-sm italic leading-relaxed">
+                        "The ROI was obvious in week one. Our dev team saved over 400 hours of manual data pipelines per month."
+                    </p>
+                    <div class="mt-6 flex items-center gap-3 pt-4 border-t border-gray-800">
+                        <div class="w-10 h-10 rounded-full bg-indigo-500/20 text-indigo-300 flex items-center justify-center font-bold">MR</div>
+                        <div>
+                            <div class="text-sm font-bold text-white">Marcus Rashid</div>
+                            <div class="text-xs text-gray-500">CTO at CloudSphere</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="border-t border-gray-800 bg-gray-950 py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-purple-600 to-teal-400 flex items-center justify-center font-bold text-white text-sm">N</div>
+                    <span class="text-xl font-bold text-white">Nexa<span class="text-purple-400">AI</span></span>
+                    <span class="text-xs text-gray-500 ml-2">© 2026 NexaAI Inc. All rights reserved.</span>
+                </div>
+
+                <div class="flex items-center gap-6 text-sm text-gray-400">
+                    <a href="#" class="hover:text-white transition-colors">Privacy Policy</a>
+                    <a href="#" class="hover:text-white transition-colors">Terms of Service</a>
+                    <a href="#" class="hover:text-white transition-colors">Documentation</a>
+                    <a href="#" class="hover:text-white transition-colors">System Status</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Interactive Checkout Modal -->
+    <div id="checkout-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden opacity-0 transition-opacity duration-300">
+        <div class="glass-panel max-w-md w-full p-8 rounded-3xl border border-purple-500/30 relative">
+            <button onclick="closeCheckout()" class="absolute top-4 right-4 text-gray-400 hover:text-white p-2">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+
+            <h3 class="text-2xl font-bold text-white mb-2">Subscribe to <span id="modal-plan-title" class="text-purple-400">Pro Plan</span></h3>
+            <p class="text-sm text-gray-400 mb-6">Start your 14-day free trial. Cancel anytime with one click.</p>
+
+            <form onsubmit="handleModalSubmit(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-gray-300 uppercase mb-1">Full Name</label>
+                    <input type="text" required placeholder="John Doe" class="w-full px-4 py-3 rounded-xl bg-gray-900 border border-gray-800 text-white focus:outline-none focus:border-purple-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-gray-300 uppercase mb-1">Work Email</label>
+                    <input type="email" required placeholder="john@company.com" class="w-full px-4 py-3 rounded-xl bg-gray-900 border border-gray-800 text-white focus:outline-none focus:border-purple-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-gray-300 uppercase mb-1">Card Details</label>
+                    <div class="relative">
+                        <input type="text" placeholder="4242 •••• •••• 4242" required class="w-full px-4 py-3 rounded-xl bg-gray-900 border border-gray-800 text-white focus:outline-none focus:border-purple-500">
+                        <i class="fa-solid fa-credit-card absolute right-4 top-3.5 text-gray-500"></i>
+                    </div>
+                </div>
+
+                <button type="submit" class="w-full py-3.5 bg-gradient-to-r from-purple-600 to-teal-500 text-white font-semibold rounded-xl shadow-lg shadow-purple-500/25 hover:opacity-95 transition-all mt-4">
+                    Confirm Free Trial
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- JavaScript Logic -->
+    <script>
+        // Drawer toggle logic
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const closeDrawerBtn = document.getElementById('close-drawer-btn');
+        const mobileDrawer = document.getElementById('mobile-drawer');
+        const drawerOverlay = document.getElementById('drawer-overlay');
+        const drawerLinks = document.querySelectorAll('.drawer-link');
+
+        function openDrawer() {
+            drawerOverlay.classList.remove('hidden');
+            setTimeout(() => {
+                drawerOverlay.classList.remove('opacity-0');
+                mobileDrawer.classList.remove('translate-x-full');
+            }, 10);
+        }
+
+        function closeDrawer() {
+            mobileDrawer.classList.add('translate-x-full');
+            drawerOverlay.classList.add('opacity-0');
+            setTimeout(() => {
+                drawerOverlay.classList.add('hidden');
+            }, 300);
+        }
+
+        mobileMenuBtn.addEventListener('click', openDrawer);
+        closeDrawerBtn.addEventListener('click', closeDrawer);
+        drawerOverlay.addEventListener('click', closeDrawer);
+        drawerLinks.forEach(link => link.addEventListener('click', closeDrawer));
+
+        // Toast Notification System
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `pointer-events-auto px-4 py-3 rounded-xl glass-panel border flex items-center gap-3 text-sm font-medium shadow-2xl transition-all duration-300 transform translate-y-4 opacity-0 ${
+                type === 'success' ? 'border-teal-500/50 text-teal-300' : 'border-purple-500/50 text-purple-300'
+            }`;
+            
+            toast.innerHTML = `
+                <i class="fa-solid ${type === 'success' ? 'fa-circle-check text-teal-400' : 'fa-bell text-purple-400'}"></i>
+                <span>${message}</span>
+            `;
+
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.classList.remove('translate-y-4', 'opacity-0');
+            }, 10);
+
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-y-4');
+                setTimeout(() => toast.remove(), 300);
+            }, 4000);
+        }
+
+        // Live Demo Simulation Logic
+        const prompts = {
+            lead: [
+                "[1/4] Triggering lead ingestion stream...",
+                "[2/4] Querying LinkedIn & Clearbit enrichment APIs...",
+                "[3/4] Scored lead prospect quality: 94/100 (High Intent)",
+                "[4/4] Automated personalized demo email sent & CRM updated."
+            ],
+            support: [
+                "[1/4] Incoming ticket ID #8492 categorized: Enterprise Billing",
+                "[2/4] Parsing context with LLM classifier...",
+                "[3/4] Verified payment status with Stripe Webhook",
+                "[4/4] Drafted refund receipt & updated customer channel in Slack."
+            ],
+            report: [
+                "[1/4] Aggregating Stripe, QuickBooks & HubSpot data...",
+                "[2/4] Executing statistical projection models...",
+                "[3/4] Generated Executive Dashboard PDF",
+                "[4/4] Broadcasted weekly report to #exec-leadership channel."
+            ]
+        };
+
+        let activePromptKey = 'lead';
+        let streamTimeout = null;
+
+        function setPrompt(key) {
+            activePromptKey = key;
+            const buttons = document.querySelectorAll('.prompt-btn');
+            buttons.forEach(btn => {
+                btn.classList.remove('border-purple-500/50', 'bg-purple-500/10', 'text-purple-300');
+                btn.classList.add('border-gray-800', 'bg-gray-900', 'text-gray-400');
+            });
+            event.currentTarget.classList.remove('border-gray-800', 'bg-gray-900', 'text-gray-400');
+            event.currentTarget.classList.add('border-purple-500/50', 'bg-purple-500/10', 'text-purple-300');
+            clearDemoStream();
+        }
+
+        function clearDemoStream() {
+            if (streamTimeout) clearTimeout(streamTimeout);
+            const box = document.getElementById('demo-output-box');
+            box.innerHTML = '<p class="text-gray-500">// Console reset. Click "Run Agent Flow" to start...</p>';
+        }
+
+        function startDemoStream() {
+            clearDemoStream();
+            const box = document.getElementById('demo-output-box');
+            box.innerHTML = '';
+            const steps = prompts[activePromptKey];
+            
+            steps.forEach((step, index) => {
+                streamTimeout = setTimeout(() => {
+                    const line = document.createElement('p');
+                    line.className = 'text-teal-400 flex items-center gap-2 animate-fadeIn';
+                    line.innerHTML = `<i class="fa-solid fa-angle-right text-purple-400 text-xs"></i> ${step}`;
+                    box.appendChild(line);
+                    box.scrollTop = box.scrollHeight;
+
+                    if (index === steps.length - 1) {
+                        showToast("Demo Workflow execution finished successfully!");
+                    }
+                }, (index + 1) * 800);
+            });
+        }
+
+        // ROI Calculator Logic
+        function calculateROI() {
+            const teamSize = parseInt(document.getElementById('team-size-range').value);
+            const rate = parseInt(document.getElementById('hourly-rate-range').value);
+            const hours = parseInt(document.getElementById('manual-hours-range').value);
+
+            document.getElementById('team-size-val').textContent = `${teamSize} Members`;
+            document.getElementById('hourly-rate-val').textContent = `$${rate} / hr`;
+            document.getElementById('manual-hours-val').textContent = `${hours} Hours`;
+
+            // Calculate savings (Assuming 75% automation efficiency)
+            const weeklyHoursSaved = teamSize * hours * 0.75;
+            const monthlyHoursSaved = Math.round(weeklyHoursSaved * 4);
+            const monthlySavingsUSD = Math.round(monthlyHoursSaved * rate);
+            
+            // Fixed Conversion Rate approx 1 USD = 278 PKR
+            const pkrSavings = Math.round(monthlySavingsUSD * 278);
+
+            document.getElementById('hours-saved').textContent = `${monthlyHoursSaved} hrs`;
+            document.getElementById('usd-savings').textContent = `$${monthlySavingsUSD.toLocaleString()}`;
+            document.getElementById('pkr-savings').textContent = `approx. PKR ${pkrSavings.toLocaleString()} / month`;
+        }
+
+        // Dynamic Pricing Switcher
+        let isYearly = false;
+        function togglePricing() {
+            isYearly = !isYearly;
+            const dot = document.getElementById('toggle-dot');
+            const monthlyLabel = document.getElementById('label-monthly');
+            const yearlyLabel = document.getElementById('label-yearly');
+            const prices = document.querySelectorAll('.plan-price');
+
+            if (isYearly) {
+                dot.classList.add('translate-x-6');
+                monthlyLabel.classList.replace('text-white', 'text-gray-400');
+                yearlyLabel.classList.replace('text-gray-400', 'text-white');
+            } else {
+                dot.classList.remove('translate-x-6');
+                yearlyLabel.classList.replace('text-white', 'text-gray-400');
+                monthlyLabel.classList.replace('text-gray-400', 'text-white');
+            }
+
+            prices.forEach(price => {
+                price.textContent = isYearly ? price.getAttribute('data-yearly') : price.getAttribute('data-monthly');
+            });
+
+            showToast(`Switched billing to ${isYearly ? 'Yearly (Save 20%)' : 'Monthly'}`, 'info');
+        }
+
+        // Checkout Modal Functions
+        function openCheckout(planName) {
+            document.getElementById('modal-plan-title').textContent = planName;
+            const modal = document.getElementById('checkout-modal');
+            modal.classList.remove('hidden');
+            setTimeout(() => modal.classList.remove('opacity-0'), 10);
+        }
+
+        function closeCheckout() {
+            const modal = document.getElementById('checkout-modal');
+            modal.classList.add('opacity-0');
+            setTimeout(() => modal.classList.add('hidden'), 300);
+        }
+
+        function handleModalSubmit(e) {
+            e.preventDefault();
+            closeCheckout();
+            showToast("Subscription successful! Welcome to NexaAI 🎉");
+        }
+
+        // Initialize ROI on load
+        window.onload = function() {
+            calculateROI();
+        }
+    </script>
+</body>
+</html>
